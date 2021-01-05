@@ -1,27 +1,40 @@
 package com.assignments.assignment5.services;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.assignments.assignment5.repository.UserRepository;
+
+import com.assignments.assignment5.models.Role;
+
+import com.assignments.assignment5.models.User;
 import com.assignments.assignment5.models.AccountHolder;
 import com.assignments.assignment5.models.AccountHoldersContactDetails;
+import com.assignments.assignment5.models.AuthenticationRequest;
 import com.assignments.assignment5.models.CDAccount;
 import com.assignments.assignment5.models.CDOffering;
 import com.assignments.assignment5.models.CheckingAccount;
+import com.assignments.assignment5.models.ERole;
 import com.assignments.assignment5.models.SavingsAccount;
+import com.assignments.assignment5.models.SignupRequest;
 import com.assignments.assignment5.repository.AccountHolderRepository;
 import com.assignments.assignment5.repository.AccountHoldersContactDetailsRepository;
 import com.assignments.assignment5.repository.CDAccountRepository;
 import com.assignments.assignment5.repository.CDOfferingRepository;
 import com.assignments.assignment5.repository.CheckingAccountRepository;
 import com.assignments.assignment5.repository.SavingsAccountRepository;
+import com.assignments.assignment5.repository.RoleRepository;
+
 
 import Exceptions.AccountNotFoundException;
 import Exceptions.ExceedsCombinedBalanceLimitException;
@@ -40,6 +53,52 @@ public class MeritBankService {
 	private CDAccountRepository cdAccountRepository;
 	@Autowired
 	private CDOfferingRepository cdOfferingRepository;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private RoleRepository roleRepository;
+	
+	public ResponseEntity<?> registerUser(SignupRequest signUpRequest) {
+		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+			return ResponseEntity
+					.badRequest()
+					.body("Error: Username is already taken!");
+		}
+		// Create new user's account
+		User user = new User(signUpRequest.getUsername(), 
+							 signUpRequest.getPassword());
+
+		Set<String> strRoles = signUpRequest.getRole();
+		Set<Role> roles = new HashSet<>();
+
+		if (strRoles == null) {
+			Role userRole = roleRepository.findByName(ERole.AccountHolder)
+					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+			roles.add(userRole);
+		} else {
+			strRoles.forEach(role -> {
+				switch (role) {
+				case "admin":
+					Role adminRole = roleRepository.findByName(ERole.admin)
+							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					roles.add(adminRole);
+
+					break;
+				default:
+					Role userRole = roleRepository.findByName(ERole.AccountHolder)
+							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					roles.add(userRole);
+				}
+			});
+
+		}
+
+		user.setActive(signUpRequest.isActive());
+		user.setRoles(roles);
+		userRepository.save(user);
+
+		return ResponseEntity.ok("User registered successfully!");
+	}
 	
 	public AccountHolder addAccountHolder(AccountHolder accountHolder) {
 		return accountHolderRepository.save(accountHolder);

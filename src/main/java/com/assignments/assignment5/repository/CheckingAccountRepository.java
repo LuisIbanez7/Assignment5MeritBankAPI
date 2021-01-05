@@ -9,5 +9,5 @@ import com.assignments.assignment5.models.CheckingAccount;
 
 public interface CheckingAccountRepository extends JpaRepository<CheckingAccount, Integer>{
 
-	//CheckingAccount findById
+
 }

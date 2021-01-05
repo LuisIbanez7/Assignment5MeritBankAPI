@@ -7,20 +7,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.assignments.assignment5.models.AccountHolder;
 import com.assignments.assignment5.models.AccountHoldersContactDetails;
+import com.assignments.assignment5.models.AuthenticationRequest;
+import com.assignments.assignment5.models.AuthenticationResponse;
 import com.assignments.assignment5.models.CDAccount;
 import com.assignments.assignment5.models.CDOffering;
 import com.assignments.assignment5.models.CheckingAccount;
 import com.assignments.assignment5.models.SavingsAccount;
+import com.assignments.assignment5.models.SignupRequest;
 import com.assignments.assignment5.services.MeritBankService;
+import com.assignments.assignment5.services.MyUserDetailsService;
+import com.assignments.assignment5.util.JwtUtil;
 
 import Exceptions.AccountNotFoundException;
 import Exceptions.ExceedsCombinedBalanceLimitException;
@@ -30,6 +41,41 @@ public class MeritBankController {
 	Logger log = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private MeritBankService meritBankService;
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	@Autowired
+	private MyUserDetailsService myUserDetailsService;
+	@Autowired
+	private JwtUtil jwtTokenUtil;
+	
+	@PostMapping("/authenticate/createUser")
+	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+		
+		return meritBankService.registerUser(signUpRequest);
+	}
+	
+	@GetMapping(value="/hello")
+	public String helloWorld() {
+		return "<h1>Hello</h1>"; 
+	}
+	
+	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+	public ResponseEntity<?> createAutheticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception{
+		try {
+			authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername()
+							, authenticationRequest.getPassword())
+					);
+		} catch (Exception e) {
+			// TODO: handle exception
+			throw new Exception("incorrect username or password", e);
+		}
+		final UserDetails userDetails = myUserDetailsService
+				.loadUserByUsername(authenticationRequest.getUsername());
+		final String jwt = jwtTokenUtil.generateToken(userDetails);
+		return ResponseEntity.ok(new AuthenticationResponse(jwt));
+				
+	}
 	
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/AccountHolders")
