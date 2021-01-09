@@ -5,12 +5,15 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
-@Table(name="User")
+@Table(name="Users")
 public class User {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name = "users_id")
 	private Integer id;
 	
 	@Column //(name="user_name")
@@ -23,9 +26,13 @@ public class User {
 	@Column
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "user_roles",
-			joinColumns = @JoinColumn(name="user_id"),
+			joinColumns = @JoinColumn(name="users_id"),
 			inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
+	
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+	
+	private AccountHolder accountHolder;
 	
 	public User() {
 		
@@ -36,6 +43,15 @@ public class User {
 		this.password = password;
 	}
 	
+	@JsonBackReference(value="users")
+	public AccountHolder getAccountHolder() {
+		return accountHolder;
+	}
+
+	public void setAccountHolder(AccountHolder accountHolder) {
+		this.accountHolder = accountHolder;
+	}
+
 	public Integer getId() {
 		return id;
 	}

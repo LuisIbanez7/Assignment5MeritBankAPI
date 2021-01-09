@@ -52,7 +52,32 @@ public class AccountHolder {
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "accountHolder", fetch = FetchType.LAZY)
 	private List<CDAccount> cDAccounts;
 	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "account_holders_contact_details_id", referencedColumnName = "account_holders_contact_details_id") 
+	AccountHoldersContactDetails accountHoldersContactDetails;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "users_id") 
+	private User user;
+	
 	public AccountHolder() {
+	}
+
+	public AccountHoldersContactDetails getAccountHoldersContactDetails() {
+		return accountHoldersContactDetails;
+	}
+
+	public void setAccountHoldersContactDetails(AccountHoldersContactDetails accountHoldersContactDetails) {
+		this.accountHoldersContactDetails = accountHoldersContactDetails;
+	}
+
+	@JsonManagedReference(value="users")
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	@JsonManagedReference

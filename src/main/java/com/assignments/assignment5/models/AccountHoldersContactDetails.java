@@ -18,14 +18,10 @@ public class AccountHoldersContactDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
+	@Column(name = "account_holders_contact_details_id")
 	Integer id;
-	String email;
+	//String email;
 	Integer phoneNumber;
-	
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "accountHolder_id", referencedColumnName = "accountHolder_id") 
-	AccountHolder accountHolder;
 	
 	public AccountHoldersContactDetails() {
 //		this.email = "";
@@ -41,14 +37,14 @@ public class AccountHoldersContactDetails {
 		return this;
 	}
 
-	public String getEmail() {
-		return email;
-	}
-
-	public AccountHoldersContactDetails setEmail(String email) {
-		this.email = email;
-		return this;
-	}
+//	public String getEmail() {
+//		return email;
+//	}
+//
+//	public AccountHoldersContactDetails setEmail(String email) {
+//		this.email = email;
+//		return this;
+//	}
 
 	public Integer getPhoneNumber() {
 		return phoneNumber;
@@ -59,12 +55,12 @@ public class AccountHoldersContactDetails {
 		return this;
 	}
 
-	public AccountHolder getAccountHolder() {
-		return accountHolder;
-	}
-
-	public AccountHoldersContactDetails setAccountHolder(AccountHolder accountHolder) {
-		this.accountHolder = accountHolder;
-		return this;
-	}
+//	public AccountHolder getAccountHolder() {
+//		return accountHolder;
+//	}
+//
+//	public AccountHoldersContactDetails setAccountHolder(AccountHolder accountHolder) {
+//		this.accountHolder = accountHolder;
+//		return this;
+//	}
 }

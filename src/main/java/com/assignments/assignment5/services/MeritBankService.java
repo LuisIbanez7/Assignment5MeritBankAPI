@@ -5,16 +5,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.assignments.assignment5.repository.UserRepository;
-
+import com.assignments.assignment5.util.JwtUtil;
 import com.assignments.assignment5.models.Role;
 
 import com.assignments.assignment5.models.User;
@@ -57,7 +60,11 @@ public class MeritBankService {
 	private UserRepository userRepository;
 	@Autowired
 	private RoleRepository roleRepository;
-	
+    @Autowired
+    private MyUserDetailsService userDetailsService;
+    @Autowired
+    private JwtUtil jwtUtil;
+
 	public ResponseEntity<?> registerUser(SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
@@ -100,7 +107,9 @@ public class MeritBankService {
 		return ResponseEntity.ok("User registered successfully!");
 	}
 	
-	public AccountHolder addAccountHolder(AccountHolder accountHolder) {
+	public AccountHolder addAccountHolder(AccountHolder accountHolder) throws AccountNotFoundException {
+		accountHolder.setUser(userRepository.findById(accountHolder.getUser().getId())
+				.orElseThrow(() -> new AccountNotFoundException("Error: User is not found.")));
 		return accountHolderRepository.save(accountHolder);
 	}
 	public List<AccountHolder> getAccountHolders(){
@@ -112,14 +121,14 @@ public class MeritBankService {
 	public AccountHolder getById(Integer id) {
 		return accountHolderRepository.findById(id).orElse(null);
 	}
-	public AccountHoldersContactDetails postContactDetails(@Valid @RequestBody AccountHoldersContactDetails ahContactDetails,
-			@PathVariable Integer id){
-		AccountHolder ah = getById(id);
-		ahContactDetails.setAccountHolder(ah);
-		//accountHolderRepository.save(ah);
-		ahContactDetailsrepository.save(ahContactDetails);
-		return ahContactDetails;
-	}
+//	public AccountHoldersContactDetails postContactDetails(@Valid @RequestBody AccountHoldersContactDetails ahContactDetails,
+//			@PathVariable Integer id){
+//		AccountHolder ah = getById(id);
+//		ahContactDetails.setAccountHolder(ah);
+//		//accountHolderRepository.save(ah);
+//		ahContactDetailsrepository.save(ahContactDetails);
+//		return ahContactDetails;
+//	}
 	public List<AccountHoldersContactDetails> getAccountHoldersContactDetails(){
 		return ahContactDetailsrepository.findAll();
 	}
@@ -165,6 +174,28 @@ public class MeritBankService {
 	public List<CDAccount> getCDAccountsbyId(int id) {
 		return getById(id).getcDAccounts();
 	}
+	
+	public AccountHolder getMyAccountInfo(HttpServletRequest request) {
+		final String authorizationHeader = request.getHeader("Authorization");
+
+		
+		String username = null;
+		String jwt = null;
+		AccountHolder ah = null;
+		
+		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+			jwt = authorizationHeader.substring(7);
+			username = jwtUtil.extractUsername(jwt);
+		}
+        if (username != null) {
+
+            User user = this.userRepository.findByUsername(username).orElseThrow(null);
+            ah = user.getAccountHolder();
+//            ah = accountHolderRepository.findById(user.getId()).orElseThrow(null);
+        }
+		return ah;
+	}
+	
 	public CDOffering postCDOffering(CDOffering cdOffering) {
 		return cdOfferingRepository.save(cdOffering);
 	}
