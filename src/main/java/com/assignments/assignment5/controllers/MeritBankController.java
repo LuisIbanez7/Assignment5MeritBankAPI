@@ -178,7 +178,27 @@ public class MeritBankController {
 	public AccountHolder getMyAccountInfo(HttpServletRequest request) {
 		return meritBankService.getMyAccountInfo(request);
 	}
+	
+	
+	
+	@PreAuthorize("hasRole('AccountHolder')")
+	@ResponseStatus(HttpStatus.CREATED)
+	@GetMapping(value = "/Me/CheckingAccount")
+	public List<CheckingAccount> getMyCheckingAccounts(HttpServletRequest request) {
+		return meritBankService.getMyCheckingAccounts(request);
+	}
+	
+	@PreAuthorize("hasRole('AccountHolder')")
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping(value = "/Me/CheckingAccount")
+	public CheckingAccount postMyCheckingAccount(HttpServletRequest request, CheckingAccount checkingAccount)
+			throws ExceedsCombinedBalanceLimitException {
+		
+		return meritBankService.postMyCheckingAccount(request, checkingAccount);
+	}
 
+	
+	
 	@PreAuthorize("hasRole('admin')")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/CDOfferings")

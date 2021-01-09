@@ -25,7 +25,7 @@ import com.assignments.assignment5.services.MyUserDetailsService;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
 		// securedEnabled = true,
-		// jsr250Enabled = true,
+		proxyTargetClass = true,
 		prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 //

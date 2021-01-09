@@ -91,7 +91,7 @@ public class MeritBankService {
 					roles.add(adminRole);
 
 					break;
-				default:
+				case "AccountHolder":
 					Role userRole = roleRepository.findByName(ERole.AccountHolder)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 					roles.add(userRole);
@@ -178,7 +178,6 @@ public class MeritBankService {
 	public AccountHolder getMyAccountInfo(HttpServletRequest request) {
 		final String authorizationHeader = request.getHeader("Authorization");
 
-		
 		String username = null;
 		String jwt = null;
 		AccountHolder ah = null;
@@ -195,6 +194,26 @@ public class MeritBankService {
         }
 		return ah;
 	}
+	
+	public List<CheckingAccount> getMyCheckingAccounts(HttpServletRequest request) {
+		AccountHolder ah = getMyAccountInfo(request);
+		return ah.getCheckingAccounts();
+	}
+	
+	public CheckingAccount postMyCheckingAccount(HttpServletRequest request, CheckingAccount checkingAccount)
+			throws ExceedsCombinedBalanceLimitException {
+		
+		AccountHolder ah = getMyAccountInfo(request);
+		if (ah.getCombinedBalance() + checkingAccount.getBalance() > 250000) {
+			throw new ExceedsCombinedBalanceLimitException("Balance exceeds limit");
+		}
+		ah.setCheckingAccounts((Arrays.asList(checkingAccount)));
+		checkingAccount.setAccountHolder(ah);
+		checkingAccountRepository.save(checkingAccount);
+		return checkingAccount;
+	}
+	
+	
 	
 	public CDOffering postCDOffering(CDOffering cdOffering) {
 		return cdOfferingRepository.save(cdOffering);
