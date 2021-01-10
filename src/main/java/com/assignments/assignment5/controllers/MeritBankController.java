@@ -54,7 +54,7 @@ public class MeritBankController {
 	@Autowired
 	private JwtUtil jwtTokenUtil;
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@PostMapping("/authenticate/createUser")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		return meritBankService.registerUser(signUpRequest);
@@ -76,7 +76,7 @@ public class MeritBankController {
 
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/AccountHolders")
 	public AccountHolder addAccountHolder(@Valid @RequestBody AccountHolder accountHolder)
@@ -84,14 +84,14 @@ public class MeritBankController {
 		return meritBankService.addAccountHolder(accountHolder);
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping(value = "/AccountHolders")
 	public List<AccountHolder> getAccountHolders() {
 		return meritBankService.getAccountHolders();
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping(value = "/AccountHolders/{id}")
 	public AccountHolder getAccountHolderById(@PathVariable Integer id) throws AccountNotFoundException {
@@ -123,7 +123,7 @@ public class MeritBankController {
 //		return meritBankService.postContactDetails(ahContactDetails, id);
 //	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@ResponseStatus(HttpStatus.OK)
 	@PostMapping(value = "/AccountHolders/{id}/CheckingAccounts")
 	public CheckingAccount postCheckingAccount(@Valid @RequestBody CheckingAccount checkingAccount,
@@ -131,7 +131,7 @@ public class MeritBankController {
 		return meritBankService.postCheckingAccount(checkingAccount, id);
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping(value = "/AccountHolders/{id}/CheckingAccounts")
 	public List<CheckingAccount> getCheckingAccountsById(@PathVariable Integer id) throws AccountNotFoundException {
@@ -143,7 +143,7 @@ public class MeritBankController {
 		}
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/AccountHolders/{id}/SavingsAccounts")
 	public SavingsAccount postSavingsAccount(@Valid @RequestBody SavingsAccount savingsAccount, @PathVariable int id)
@@ -151,28 +151,28 @@ public class MeritBankController {
 		return meritBankService.postSavingsAccount(savingsAccount, id);
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping(value = "/AccountHolders/{id}/SavingsAccounts")
 	public List<SavingsAccount> getSavingsAccountsById(@PathVariable int id) throws AccountNotFoundException {
 		return meritBankService.getSavingsAccountsById(id);
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@PostMapping(value = "/AccountHolders/{id}/CDAccounts")
 	public CDAccount postCDAccount(@Valid @RequestBody CDAccount cdAccount, @PathVariable int id)
 			throws AccountNotFoundException, ExceedsCombinedBalanceLimitException {
 		return meritBankService.postCDAccount(cdAccount, id);
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@ResponseStatus(HttpStatus.CREATED)
 	@GetMapping(value = "/AccountHolders/{id}/CDAccounts")
 	public List<CDAccount> getCDAccountsbyId(@PathVariable int id) {
 		return meritBankService.getCDAccountsbyId(id);
 	}
 
-	// @PreAuthorize("hasRole('AccountHolder')")
+    @PreAuthorize("hasAuthority('AccountHolder')")
 	@ResponseStatus(HttpStatus.CREATED)
 	@GetMapping(value = "/Me")
 	public AccountHolder getMyAccountInfo(HttpServletRequest request) {
@@ -181,17 +181,17 @@ public class MeritBankController {
 	
 	
 	
-	@PreAuthorize("hasRole('AccountHolder')")
+	@PreAuthorize("hasAuthority('AccountHolder')")
 	@ResponseStatus(HttpStatus.CREATED)
 	@GetMapping(value = "/Me/CheckingAccount")
 	public List<CheckingAccount> getMyCheckingAccounts(HttpServletRequest request) {
 		return meritBankService.getMyCheckingAccounts(request);
 	}
 	
-	@PreAuthorize("hasRole('AccountHolder')")
+	@PreAuthorize("hasAuthority('AccountHolder')")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/Me/CheckingAccount")
-	public CheckingAccount postMyCheckingAccount(HttpServletRequest request, CheckingAccount checkingAccount)
+	public CheckingAccount postMyCheckingAccount(HttpServletRequest request,@Valid @RequestBody CheckingAccount checkingAccount)
 			throws ExceedsCombinedBalanceLimitException {
 		
 		return meritBankService.postMyCheckingAccount(request, checkingAccount);

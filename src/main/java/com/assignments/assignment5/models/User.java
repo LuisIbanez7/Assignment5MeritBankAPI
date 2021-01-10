@@ -31,7 +31,6 @@ public class User {
 	private Set<Role> roles = new HashSet<>();
 	
 	@OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
-	
 	private AccountHolder accountHolder;
 	
 	public User() {
