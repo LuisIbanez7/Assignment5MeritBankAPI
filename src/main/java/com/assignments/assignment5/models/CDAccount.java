@@ -2,6 +2,7 @@ package com.assignments.assignment5.models;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -23,8 +24,8 @@ public class CDAccount extends BankAccount {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 	
-	@ManyToOne
-	@JoinColumn(name = "offering_id") 
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "offering_id", nullable = false) 
 	private CDOffering cDOffering;
 	 
 	public CDAccount() {

@@ -24,7 +24,7 @@ public class CDOffering {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "offering_id")
-	Integer id;
+	private Integer id;
 	
 	@Min(value = 1, message = "Term must be atleast one")
 	Integer term;
@@ -33,7 +33,8 @@ public class CDOffering {
 	@DecimalMax(value = "1.0", inclusive = false, message = "interest rate must be less than one")
 	double interestRate; 
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "cDOffering", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "cDOffering", fetch = FetchType.LAZY,
+			cascade = CascadeType.ALL)
 	private List<CDAccount> cDAccounts;
 	
 	public CDOffering() {

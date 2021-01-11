@@ -157,6 +157,7 @@ public class MeritBankService {
 		savingsAccountRepository.save(savingsAccount);
 		return savingsAccount;
 	}
+	
 	public List<SavingsAccount> getSavingsAccountsById(int id) throws AccountNotFoundException {
 		return getById(id).getSavingsAccounts();
 	}
@@ -212,8 +213,42 @@ public class MeritBankService {
 		checkingAccountRepository.save(checkingAccount);
 		return checkingAccount;
 	}
+	public SavingsAccount postMySavingsAccount(HttpServletRequest request, SavingsAccount savingsAccount)
+			throws ExceedsCombinedBalanceLimitException {
+		
+		AccountHolder ah = getMyAccountInfo(request);
+		if (ah.getCombinedBalance() + savingsAccount.getBalance() > 250000) {
+			throw new ExceedsCombinedBalanceLimitException("Balance exceeds limit");
+		}
+		ah.setSavingsAccounts((Arrays.asList(savingsAccount)));
+		savingsAccount.setAccountHolder(ah);
+		savingsAccountRepository.save(savingsAccount);
+		return savingsAccount;
+	}
+
+	public List<SavingsAccount> getMySavingsAccounts(HttpServletRequest request) {
+		AccountHolder ah = getMyAccountInfo(request);
+		return ah.getSavingsAccounts();
+	}
+	
+	public CDAccount postMyCDAccounts(HttpServletRequest request, CDAccount cDAccount)
+			throws ExceedsCombinedBalanceLimitException {
+		
+		AccountHolder ah = getMyAccountInfo(request);
+		if (ah.getCombinedBalance() + cDAccount.getBalance() > 250000) {
+			throw new ExceedsCombinedBalanceLimitException("Balance exceeds limit");
+		}
+		ah.setcDAccounts((Arrays.asList(cDAccount)));
+		cDAccount.setAccountHolder(ah);
+		cdAccountRepository.save(cDAccount);
+		return cDAccount;
+	}
 	
 	
+	public List<CDAccount> getMyCDAccount(HttpServletRequest request) {
+		AccountHolder ah = getMyAccountInfo(request);
+		return ah.getcDAccounts();
+	}
 	
 	public CDOffering postCDOffering(CDOffering cdOffering) {
 		return cdOfferingRepository.save(cdOffering);

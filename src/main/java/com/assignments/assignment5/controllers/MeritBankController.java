@@ -197,16 +197,44 @@ public class MeritBankController {
 		return meritBankService.postMyCheckingAccount(request, checkingAccount);
 	}
 
+	@PreAuthorize("hasAuthority('AccountHolder')")
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping(value = "/Me/SavingsAccounts")
+	public SavingsAccount postMySavingsAccounts(HttpServletRequest request, @Valid @RequestBody SavingsAccount savingsAccount) 
+			throws ExceedsCombinedBalanceLimitException{
+		return meritBankService.postMySavingsAccount(request, savingsAccount);
+	}
 	
+	@PreAuthorize("hasAuthority('AccountHolder')")
+	@ResponseStatus(HttpStatus.CREATED)
+	@GetMapping(value = "/Me/SavingsAccounts")
+	public List<SavingsAccount> getMySavingsAccounts(HttpServletRequest request){
+		return meritBankService.getMySavingsAccounts(request);
+	}
 	
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('AccountHolder')")
+	@ResponseStatus(HttpStatus.CREATED)
+	@PostMapping(value = "/Me/CDAccounts")
+	public CDAccount postMyCDAccounts(HttpServletRequest request, @Valid @RequestBody CDAccount cDAccount)
+	throws ExceedsCombinedBalanceLimitException {
+		return meritBankService.postMyCDAccounts(request, cDAccount);
+	}
+	
+	@PreAuthorize("hasAuthority('AccountHolder')")
+	@ResponseStatus(HttpStatus.CREATED)
+	@GetMapping(value = "/Me/CDAccounts")
+	public List<CDAccount> getMyCDAccounts(HttpServletRequest request) {
+		return meritBankService.getMyCDAccount(request);
+	}
+	
+	@PreAuthorize("hasAuthority('admin')")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(value = "/CDOfferings")
 	public CDOffering postCDOffering(@Valid @RequestBody CDOffering cdOffering) {
 		return meritBankService.postCDOffering(cdOffering);
 	}
 
-	@PreAuthorize("hasRole('admin') or hasRole('AccountHolder')")
+	@PreAuthorize("hasAuthority('admin') or hasAuthority('AccountHolder')")
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping(value = "/CDOfferings")
 	public List<CDOffering> getCDOfferings() {
